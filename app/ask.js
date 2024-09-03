@@ -14,6 +14,7 @@ export default function Ask() {
   const [messages, setMessages] = useState([]);
   const [thinkingMessageIndex, setThinkingMessageIndex] = useState(1);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false); // Added state for collapsing
   const textareaRef = useRef(null);
 
   // Array for bubbly texts
@@ -160,6 +161,10 @@ export default function Ask() {
     }
   };
 
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
+  };
+
   return (
     <div className="flex flex-col items-center mb-8 mx-12">
       <div className="flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg w-full">
@@ -206,7 +211,12 @@ export default function Ask() {
           </button>
         </div>
 
-        {messages.length > 0 && (
+        {/* Toggle button */}
+        
+
+        <div className="relative flex flex-col space-y-4 w-full">
+
+        {!isCollapsed && messages.length > 0 && (
           <div className="p-4 bg-gray-200 rounded-lg shadow-md space-y-4">
             {error && (
               <div className="mb-4 p-4 bg-red-200 text-red-800 rounded-lg">
@@ -243,7 +253,7 @@ export default function Ask() {
                         <div className="p-4 rounded-lg bg-gray-100">
                           {msg.type === 'system' && index === thinkingMessageIndex && loading ? (
                             <div className="flex items-center space-x-2">
-                              <span className="font-semibold">Thinking</span>
+                              {/* <span className="font-semibold">Thinking</span> */}
                               <div className="animate-bounce">
                                 <span>.</span><span className="ml-1">.</span><span className="ml-1">.</span>
                               </div>
@@ -275,6 +285,17 @@ export default function Ask() {
             ))}
           </div>
         )}
+        {messages.length > 0 && (
+          <button
+          onClick={toggleCollapse}
+          className="mt-4 mx-auto block bg-gray-300 p-3 rounded-full shadow-lg"
+        >
+          {isCollapsed ? 'Expand' : 'Collapse'}
+        </button>
+        
+        )}
+        
+        </div>
       </div>
     </div>
   );
