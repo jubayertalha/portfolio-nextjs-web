@@ -13,7 +13,15 @@ export default function Ask() {
   const [startTime, setStartTime] = useState(0);
   const [messages, setMessages] = useState([]);
   const [thinkingMessageIndex, setThinkingMessageIndex] = useState(1);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const textareaRef = useRef(null);
+
+  // Array for bubbly texts
+  const bubblyTexts = [
+    'Tell me about Talha.',
+    'Who are Talha\'s friends?',
+    'Tell me about Talha\'s programming journey.'
+  ];
 
   useEffect(() => {
     let index = -1;
@@ -30,7 +38,7 @@ export default function Ask() {
             updatedMessages[thinkingMessageIndex] = { 
               type: 'system', 
               text: answer, 
-              time: ` Responsed in ${timeTaken}m`
+              time: `Responded in ${timeTaken}m`
             };
             return updatedMessages;
           });
@@ -137,9 +145,40 @@ export default function Ask() {
     }
   };
 
+  const handleMouseEnter = (index) => {
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+  };
+
+  const handleBubblyClick = (text) => {
+    setQuery(text);
+    if (textareaRef.current) {
+      textareaRef.current.focus(); // Focus the textarea
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center mb-8">
-      <div className="flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg w-full max-w-2xl">
+    <div className="flex flex-col items-center mb-8 mx-12">
+      <div className="flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg w-full">
+        {/* Bubbly texts section */}
+        <div className="relative flex items-center mx-5">
+          {bubblyTexts.map((text, index) => (
+            <div
+              key={index}
+              className={`rounded-full bg-white text-gray-500 px-4 py-2 text-xs font-medium shadow-md ${hoveredIndex === index ? 'animate-none' : 'animate-float'} cursor-pointer`}
+              style={{ margin: '0.5rem', position: 'relative' }}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
+              onClick={() => handleBubblyClick(text)}
+            >
+              {text}
+            </div>
+          ))}
+        </div>
+        
         <div className="flex items-center space-x-2">
           <textarea
             ref={textareaRef}
@@ -153,7 +192,7 @@ export default function Ask() {
           />
           <button
             onClick={handleAsk}
-            className="ml-2 p-4 bg-blue-600 text-white rounded-full flex items-center justify-center"
+            className="ml-2 p-4 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
             disabled={loading || query.length <= 1} // Disable if loading or query is too short
           >
             {loading ? (
@@ -182,13 +221,13 @@ export default function Ask() {
                 {msg.type === 'user' ? (
                   <div className={`flex items-start space-x-2 ${msg.animation || ''}`}>
                     <div className="flex-1 min-w-0">
-                      <div className={`p-4 rounded-lg bg-blue-100 text-left`}>
+                      <div className="p-4 rounded-lg bg-blue-100 text-left">
                         <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
                           {msg.text}
                         </p>
                       </div>
                     </div>
-                    <div className={`w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center`}>
+                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                       {/* Reduced image size and kept image aligned to the top */}
                       <img src="/favicon.ico" alt="User Logo" className="w-7 h-7 object-cover" />
                     </div>
@@ -196,12 +235,12 @@ export default function Ask() {
                 ) : (
                   <div className="flex items-start">
                     <div className="flex items-start">
-                      <div className={`mr-2 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center`}>
+                      <div className="mr-2 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                         {/* Reduced image size and kept image aligned to the top */}
                         <img src="/favicon.ico" alt="Site Logo" className="w-7 h-7 object-cover" />
                       </div>
                       <div className="flex-1">
-                        <div className={`p-4 rounded-lg bg-gray-100`}>
+                        <div className="p-4 rounded-lg bg-gray-100">
                           {msg.type === 'system' && index === thinkingMessageIndex && loading ? (
                             <div className="flex items-center space-x-2">
                               <span className="font-semibold">Thinking</span>
