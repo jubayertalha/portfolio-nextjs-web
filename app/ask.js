@@ -69,7 +69,7 @@ export default function Ask() {
     const trimmedQuery = query.trim();
 
     // Validation to ensure query has more than one letter and is not empty or just spaces
-    if (trimmedQuery.length <= 1) return;
+    if (trimmedQuery.length <= 1 || typing) return;
 
     setLoading(true);
     setError('');
@@ -129,7 +129,7 @@ export default function Ask() {
         e.preventDefault();
         
         // Trim the query and check if it has more than one letter
-        if (query.trim().length > 1) {
+        if (query.trim().length > 1 && !typing && !loading) {
           handleAsk();
         }
       }
@@ -163,6 +163,10 @@ export default function Ask() {
 
   const toggleCollapse = () => {
     setIsCollapsed((prev) => !prev);
+    if (!isCollapsed) {
+      // Scroll to the top when collapsing
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
   };
 
   return (
@@ -197,8 +201,8 @@ export default function Ask() {
           />
           <button
             onClick={handleAsk}
-            className="ml-2 p-4 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg"
-            disabled={loading || query.length <= 1} // Disable if loading or query is too short
+            className="ml-2 p-2 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform hover:bg-blue-800"
+            disabled={loading || query.trim().length <= 1 || typing} // Disable if loading or query is too short
           >
             {loading ? (
               <div className="flex items-center">
@@ -206,96 +210,89 @@ export default function Ask() {
                 <span className="ml-2 text-xs font-normal">{timeTaken}</span>
               </div>
             ) : (
-              <span className="text-xs font-normal">ASK</span>
+              <img src="/send.ico" alt="Send" className="w-6 h-6 filter invert shadow-sm" />
             )}
           </button>
         </div>
 
-        {/* Toggle button */}
-        
-
-        <div className="relative flex flex-col space-y-4 w-full">
-
-        {!isCollapsed && messages.length > 0 && (
-          <div className="p-4 bg-gray-200 rounded-lg shadow-md space-y-4">
-            {error && (
-              <div className="mb-4 p-4 bg-red-200 text-red-800 rounded-lg">
-                {error}
-              </div>
-            )}
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex ${msg.type === 'user' ? 'justify-end' : ''}`}
-              >
-                {msg.type === 'user' ? (
-                  <div className={`flex items-start space-x-2 ${msg.animation || ''}`}>
-                    <div className="flex-1 min-w-0">
-                      <div className="p-4 rounded-lg bg-blue-100 text-left">
-                        <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
-                          {msg.text}
-                        </p>
+        <div className={`relative flex flex-col space-y-4 w-full overflow-hidden transition-max-height duration-1000 ease-in-out ${isCollapsed ? 'max-h-0' : 'max-h-[10000px]'}`}>
+          {!isCollapsed && messages.length > 0 && (
+            <div className="p-4 bg-gray-200 rounded-lg shadow-md space-y-4">
+              {error && (
+                <div className="mb-4 p-4 bg-red-200 text-red-800 rounded-lg">
+                  {error}
+                </div>
+              )}
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`flex ${msg.type === 'user' ? 'justify-end' : ''}`}
+                >
+                  {msg.type === 'user' ? (
+                    <div className={`flex items-start space-x-2 ${msg.animation || ''}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="p-4 rounded-lg bg-blue-100 text-left">
+                          <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
+                            {msg.text}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                      {/* Reduced image size and kept image aligned to the top */}
-                      <img src="/favicon.ico" alt="User Logo" className="w-7 h-7 object-cover" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-start">
-                    <div className="flex items-start">
-                      <div className="mr-2 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                         {/* Reduced image size and kept image aligned to the top */}
-                        <img src="/favicon.ico" alt="Site Logo" className="w-7 h-7 object-cover" />
+                        <img src="/user.ico" alt="User Logo" className="w-7 h-7 object-cover" />
                       </div>
-                      <div className="flex-1">
-                        <div className="p-4 rounded-lg bg-gray-100">
-                          {msg.type === 'system' && index === thinkingMessageIndex && loading ? (
-                            <div className="flex items-center space-x-2">
-                              {/* <span className="font-semibold">Thinking</span> */}
-                              <div className="animate-bounce">
-                                <span>.</span><span className="ml-1">.</span><span className="ml-1">.</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-start">
+                      <div className="flex items-start">
+                        <div className="mr-2 w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                          {/* Reduced image size and kept image aligned to the top */}
+                          <img src="/favicon.ico" alt="Site Logo" className="w-7 h-7 object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="p-4 rounded-lg bg-gray-100">
+                            {msg.type === 'system' && index === thinkingMessageIndex && loading ? (
+                              <div className="flex items-center space-x-2">
+                                {/* <span className="font-semibold">Thinking</span> */}
+                                <div className="animate-bounce">
+                                  <span>.</span><span className="ml-1">.</span><span className="ml-1">.</span>
+                                </div>
                               </div>
-                            </div>
-                          ) : msg.type === 'system' && index === thinkingMessageIndex ? (
-                            <div>
-                              <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
-                                {displayedAnswer}
-                              </p>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
-                                {msg.text}
-                              </p>
-                            </div>
+                            ) : msg.type === 'system' && index === thinkingMessageIndex ? (
+                              <div>
+                                <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
+                                  {displayedAnswer}
+                                </p>
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="text-gray-800" style={{ fontFamily: 'Georgia, serif', fontSize: '16px' }}>
+                                  {msg.text}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          {msg.time && (
+                            <p className="text-xs text-gray-500 mt-1 ml-2">
+                              {msg.time}
+                            </p>
                           )}
                         </div>
-                        {msg.time && (
-                          <p className="text-xs text-gray-500 mt-1 ml-2">
-                            {msg.time}
-                          </p>
-                        )}
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         {messages.length > 0 && (
           <button
-          onClick={toggleCollapse}
-          className="mt-4 mx-auto block bg-gray-300 p-3 rounded-full shadow-lg"
-        >
-          {isCollapsed ? 'Expand' : 'Collapse'}
-        </button>
-        
+            onClick={toggleCollapse}
+            className="mx-auto">
+            {isCollapsed ? <img src="/expand.ico" alt="Expand" className="w-10 h-10 transform hover:scale-110 transition-transform duration-200" /> : <img src="/collapse.ico" alt="Collapse" className="w-10 h-10 transform hover:scale-110 transition-transform duration-200" />}
+          </button>
         )}
-        
-        </div>
       </div>
     </div>
   );
