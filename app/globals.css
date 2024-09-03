@@ -31,3 +31,18 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes popUp {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.user-chat {
+  animation: popUp 0.3s ease-out;
+}
