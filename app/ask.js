@@ -171,7 +171,7 @@ export default function Ask() {
 
   return (
     <div className="flex flex-col items-center mb-8 mx-12">
-      <div className="flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg w-full">
+      <div className="flex flex-col space-y-4 bg-indigo-400 p-6 rounded-lg shadow-lg w-full">
         {/* Bubbly texts section */}
         <div className="relative flex items-center mx-5">
           {bubblyTexts.map((text, index) => (
@@ -201,7 +201,7 @@ export default function Ask() {
           />
           <button
             onClick={handleAsk}
-            className="ml-2 p-2 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transform hover:bg-blue-800"
+            className="ml-2 p-2 bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg transform hover:bg-blue-600"
             disabled={loading || query.trim().length <= 1 || typing} // Disable if loading or query is too short
           >
             {loading ? (
@@ -217,7 +217,7 @@ export default function Ask() {
 
         <div className={`relative flex flex-col space-y-4 w-full overflow-hidden transition-max-height duration-1000 ease-in-out ${isCollapsed ? 'max-h-0' : 'max-h-[10000px]'}`}>
           {!isCollapsed && messages.length > 0 && (
-            <div className="p-4 bg-gray-200 rounded-lg shadow-md space-y-4">
+            <div className="p-4 rounded-lg shadow-md space-y-4">
               {error && (
                 <div className="mb-4 p-4 bg-red-200 text-red-800 rounded-lg">
                   {error}
